@@ -1,0 +1,88 @@
+[
+  {
+    "check": "Auto tour explores all three cases with changing execution steps",
+    "passed": true,
+    "cases": [
+      "Operations",
+      "Sales",
+      "Team updates"
+    ],
+    "events": 11
+  },
+  {
+    "check": "Pause stops automatic progression",
+    "passed": true
+  },
+  {
+    "check": "Manual tab selection pauses and changes content",
+    "passed": true
+  },
+  {
+    "check": "Arrow keys select the next use case",
+    "passed": true
+  },
+  {
+    "route": "/dashboard",
+    "width": 1440,
+    "overflow": 0
+  },
+  {
+    "route": "/workflows/order-intake",
+    "width": 1440,
+    "overflow": 0
+  },
+  {
+    "check": "Editor colors differentiate all five node types and their connections",
+    "passed": true
+  },
+  {
+    "route": "/templates",
+    "width": 1440,
+    "overflow": 0
+  },
+  {
+    "route": "/dashboard",
+    "width": 768,
+    "overflow": 0
+  },
+  {
+    "route": "/workflows/order-intake",
+    "width": 768,
+    "overflow": 0
+  },
+  {
+    "check": "Editor colors differentiate all five node types and their connections",
+    "passed": true
+  },
+  {
+    "route": "/templates",
+    "width": 768,
+    "overflow": 0
+  },
+  {
+    "route": "/dashboard",
+    "width": 390,
+    "overflow": 0
+  },
+  {
+    "route": "/workflows/order-intake",
+    "width": 390,
+    "overflow": 0
+  },
+  {
+    "check": "Editor colors differentiate all five node types and their connections",
+    "passed": true
+  },
+  {
+    "route": "/templates",
+    "width": 390,
+    "overflow": 0
+  },
+  {
+    "check": "Reduced motion uses stable manual exploration",
+    "passed": true
+  },
+  {
+    "consoleErrors": []
+  }
+]

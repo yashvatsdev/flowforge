@@ -1,0 +1,108 @@
+/* Dark surface hierarchy: canvas → panels → raised controls → floating menus. */
+:root {
+  --canvas: #07090b;
+  --raised: #171d23;
+  --floating: #1d252d;
+  --line-soft: #1b2229;
+  --line-strong: #40505e;
+  --heading: #f1f4f7;
+  --code-ink: #cbd7e2;
+}
+
+.ff-site :is(h1,h2,h3), .app-shell :is(h1,h2,h3) { color:var(--heading); }
+.panel, .metrics-grid, .ff-workbench,
+.ff-logic-fragment, .ff-output-fragment, .ff-workspace-fragment {
+  border-color:var(--line-soft);
+}
+.sidebar, .app-topbar, .editor-heading, .editor-notice,
+.node-palette, .config-panel, .execution-console, .playback-toolbar {
+  border-color:var(--line-soft);
+}
+.workspace-switch, .sandbox-card, .profile, .ff-bench-bar,
+.ff-demo-controls, .ff-demo-bottom, .ff-inspection {
+  border-color:var(--line-soft);
+}
+.workspace-switch, .sandbox-card { background:var(--base); }
+.sidebar nav>a.active { background:var(--raised); border-color:var(--line); }
+.metric { border-right-color:var(--line-soft); border-top-color:color-mix(in srgb,var(--metric-tone) 45%,var(--line-soft)); }
+.metric>strong { color:var(--heading); }
+.data-table th { color:var(--muted); }
+.data-table th, .data-table td { border-color:var(--line-soft); }
+.data-table tr:hover td { background:var(--raised); }
+.app-shell :is(input,textarea,select), .payload-switch { background-color:var(--base); }
+.app-shell .editor-name input { background:transparent; }
+.app-shell :is(input,textarea,select):focus-visible { border-color:var(--blue); }
+.app-shell .btn:not(.primary):not(.danger):hover { background:var(--raised); border-color:var(--line-strong); }
+.chart-column>.chart-tooltip, .ff-navigation.is-open, .modal {
+  background:var(--floating);
+  border-color:var(--line-strong);
+}
+
+/* Inactive nodes recede; color stays concentrated on icons, ports, and state. */
+.forge-node { background:var(--panel); }
+.forge-node:not(.selected):not(.running):not(.failed) {
+  border-color:var(--line-soft);
+  border-left-color:color-mix(in srgb,var(--node-tone) 55%,var(--line-soft));
+}
+.forge-node-kind { color:var(--muted); }
+.forge-node.selected {
+  outline:1px solid var(--blue);
+  outline-offset:3px;
+  border-color:color-mix(in srgb,var(--node-tone) 55%,var(--line-strong));
+}
+.forge-node.running {
+  background:var(--raised);
+  border-color:var(--node-tone);
+  box-shadow:0 0 24px -10px color-mix(in srgb,var(--node-tone) 22%,transparent);
+}
+.forge-node.running .react-flow__handle {
+  background:var(--node-tone);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--node-tone) 9%,transparent),
+    0 0 12px color-mix(in srgb,var(--node-tone) 30%,transparent);
+}
+.node-run-state, .node-config-preview { border-color:var(--line-soft); }
+.palette-node { border-color:var(--line-soft); border-left-color:color-mix(in srgb,var(--node-tone) 55%,var(--line-soft)); }
+.palette-node:hover { background:var(--raised); border-color:var(--node-tone); }
+.ff-node:not(.is-running):not(.is-selected) {
+  border-color:var(--line-soft);
+  border-top-color:color-mix(in srgb,var(--node-tone) 55%,var(--line-soft));
+}
+.ff-node .ff-node-type { color:var(--muted); }
+.ff-node.is-running, .ff-case-node[data-state=running] {
+  background:var(--raised);
+  border-color:var(--node-tone);
+  box-shadow:0 0 22px -12px color-mix(in srgb,var(--node-tone) 24%,transparent);
+}
+.ff-node.is-running .ff-port {
+  background:var(--node-tone);
+  box-shadow:0 0 10px color-mix(in srgb,var(--node-tone) 35%,transparent);
+}
+.ff-case-node:not([data-state=running]) {
+  border-color:var(--line-soft);
+  border-top-color:color-mix(in srgb,var(--node-tone) 55%,var(--line-soft));
+}
+
+/* The texture lives on the canvas, never over text or interactive controls. */
+.flow-canvas {
+  background:radial-gradient(ellipse at 55% 45%,#0d1115 0%,var(--canvas) 80%);
+}
+.flow-canvas .react-flow { --xy-background-color:transparent; }
+.react-flow__background {
+  mask-image:radial-gradient(ellipse at center,#000 30%,transparent 100%);
+}
+.ff-graph {
+  background-color:var(--canvas);
+  background-image:radial-gradient(var(--line-soft) .65px,transparent .65px),
+    radial-gradient(ellipse at 52% 40%,#0c1116,var(--canvas) 78%);
+  background-size:18px 18px,100% 100%;
+}
+.canvas-badge { background:var(--panel); border-color:var(--line); }
+.payload-field { border-color:var(--line-soft); }
+.payload-field>code { color:var(--code-ink); font-variant-numeric:tabular-nums; }
+.payload-field[data-changed=true]>code:first-child { color:var(--success); }
+.playback-payload-heading>div:first-child>strong { color:var(--heading); }
+
+@media (forced-colors:active) {
+  .forge-node.selected { outline:2px solid Highlight; }
+  .forge-node.running, .ff-node.is-running { outline:1px solid Highlight; }
+}

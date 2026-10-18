@@ -1,0 +1,41 @@
+[
+  {
+    "route": "/",
+    "width": 1440,
+    "overflow": 0,
+    "background": "rgb(8, 9, 11)",
+    "base": "#08090b",
+    "panel": "#0e1114",
+    "colorScheme": "dark"
+  },
+  {
+    "route": "/dashboard",
+    "width": 1440,
+    "overflow": 0,
+    "background": "rgb(8, 9, 11)",
+    "base": "#08090b",
+    "panel": "#0e1114",
+    "colorScheme": "dark"
+  },
+  {
+    "route": "/",
+    "width": 390,
+    "overflow": 0,
+    "background": "rgb(8, 9, 11)",
+    "base": "#08090b",
+    "panel": "#0e1114",
+    "colorScheme": "dark"
+  },
+  {
+    "route": "/dashboard",
+    "width": 390,
+    "overflow": 0,
+    "background": "rgb(8, 9, 11)",
+    "base": "#08090b",
+    "panel": "#0e1114",
+    "colorScheme": "dark"
+  },
+  {
+    "consoleErrors": []
+  }
+]

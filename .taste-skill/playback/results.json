@@ -1,0 +1,51 @@
+[
+  {
+    "check": "Node previews show configuration values",
+    "passed": true
+  },
+  {
+    "check": "Pause preserves count without recording a partial run",
+    "passed": true
+  },
+  {
+    "check": "Single step advances once and highlights payload additions",
+    "passed": true
+  },
+  {
+    "check": "Input excludes fields added by the current transform",
+    "passed": true
+  },
+  {
+    "check": "Completed playback records one run and dims skipped branch",
+    "passed": true
+  },
+  {
+    "check": "Editing configuration updates preview and clears stale playback",
+    "passed": true
+  },
+  {
+    "check": "Failure playback marks failed request and skips downstream path",
+    "passed": true
+  },
+  {
+    "check": "Dashboard differentiates successful and failed executions",
+    "passed": true
+  },
+  {
+    "check": "Playback stays within viewport",
+    "width": 768,
+    "passed": true
+  },
+  {
+    "check": "Playback stays within viewport",
+    "width": 390,
+    "passed": true
+  },
+  {
+    "check": "Reduced motion keeps controls working without moving connectors",
+    "passed": true
+  },
+  {
+    "consoleErrors": []
+  }
+]

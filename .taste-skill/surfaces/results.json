@@ -1,0 +1,68 @@
+[
+  {
+    "route": "/",
+    "width": 1440,
+    "overflow": 0,
+    "activePortLight": null,
+    "heading": "rgb(241, 244, 247)"
+  },
+  {
+    "route": "/dashboard",
+    "width": 1440,
+    "overflow": 0,
+    "activePortLight": null,
+    "heading": "rgb(241, 244, 247)"
+  },
+  {
+    "route": "/workflows/order-intake",
+    "width": 1440,
+    "overflow": 0,
+    "activePortLight": "color(srgb 0.658824 0.780392 0.901961 / 0.09) 0px 0px 0px 4px, color(srgb 0.658824 0.780392 0.901961 / 0.3) 0px 0px 12px 0px",
+    "heading": "rgb(233, 237, 241)"
+  },
+  {
+    "route": "/",
+    "width": 768,
+    "overflow": 0,
+    "activePortLight": null,
+    "heading": "rgb(241, 244, 247)"
+  },
+  {
+    "route": "/dashboard",
+    "width": 768,
+    "overflow": 0,
+    "activePortLight": null,
+    "heading": "rgb(241, 244, 247)"
+  },
+  {
+    "route": "/workflows/order-intake",
+    "width": 768,
+    "overflow": 0,
+    "activePortLight": "color(srgb 0.658824 0.780392 0.901961 / 0.09) 0px 0px 0px 4px, color(srgb 0.658824 0.780392 0.901961 / 0.3) 0px 0px 12px 0px",
+    "heading": "rgb(233, 237, 241)"
+  },
+  {
+    "route": "/",
+    "width": 390,
+    "overflow": 0,
+    "activePortLight": null,
+    "heading": "rgb(241, 244, 247)"
+  },
+  {
+    "route": "/dashboard",
+    "width": 390,
+    "overflow": 0,
+    "activePortLight": null,
+    "heading": "rgb(241, 244, 247)"
+  },
+  {
+    "route": "/workflows/order-intake",
+    "width": 390,
+    "overflow": 0,
+    "activePortLight": "color(srgb 0.658824 0.780392 0.901961 / 0.09) 0px 0px 0px 4px, color(srgb 0.658824 0.780392 0.901961 / 0.3) 0px 0px 12px 0px",
+    "heading": "rgb(233, 237, 241)"
+  },
+  {
+    "consoleErrors": []
+  }
+]

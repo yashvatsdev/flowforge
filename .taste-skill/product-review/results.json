@@ -1,0 +1,94 @@
+[
+  {
+    "route": "/dashboard",
+    "width": 1440,
+    "overflow": 0,
+    "heading": "Welcome back, Alex.",
+    "errors": []
+  },
+  {
+    "route": "/workflows/order-intake",
+    "width": 1440,
+    "overflow": 0,
+    "heading": "",
+    "errors": []
+  },
+  {
+    "route": "/dashboard",
+    "width": 768,
+    "overflow": 0,
+    "heading": "Welcome back, Alex.",
+    "errors": []
+  },
+  {
+    "route": "/workflows/order-intake",
+    "width": 768,
+    "overflow": 0,
+    "heading": "",
+    "errors": []
+  },
+  {
+    "route": "/dashboard",
+    "width": 390,
+    "overflow": 0,
+    "heading": "Welcome back, Alex.",
+    "errors": []
+  },
+  {
+    "route": "/workflows/order-intake",
+    "width": 390,
+    "overflow": 0,
+    "heading": "",
+    "errors": []
+  },
+  {
+    "check": "landing has six graph nodes",
+    "passed": true
+  },
+  {
+    "check": "high-value order skips standard queue",
+    "passed": true
+  },
+  {
+    "check": "changing amount routes standard order",
+    "passed": true
+  },
+  {
+    "check": "use-case selection updates content and destination",
+    "passed": true
+  },
+  {
+    "check": "FAQ expands",
+    "passed": true
+  },
+  {
+    "check": "editor run persists execution",
+    "passed": true,
+    "executions": 1
+  },
+  {
+    "check": "dashboard renders recorded run",
+    "passed": true,
+    "metric": "01"
+  },
+  {
+    "check": "history renders recorded run",
+    "passed": true
+  },
+  {
+    "check": "reduced motion offers manual preview with visible content",
+    "passed": true,
+    "overflow": 0
+  },
+  {
+    "check": "mobile menu opens with keyboard focus",
+    "passed": true
+  },
+  {
+    "check": "Escape closes menu and restores focus",
+    "passed": true
+  },
+  {
+    "consoleErrors": []
+  }
+]

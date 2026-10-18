@@ -1,0 +1,33 @@
+import { Browser, sleep } from 'file:///C:/Users/yashv/.agents/skills/design-taste-frontend/scripts/lib/cdp.mjs';
+import { mkdirSync } from 'node:fs';
+mkdirSync('.taste-skill/ambient', { recursive: true });
+const browser = await Browser.launch();
+const results = [];
+try {
+  const page = await browser.newPage({ width:1440, height:900 });
+  await page.goto('http://127.0.0.1:3000');
+  const snapshot = () => page.eval(() => document.querySelector('.ff-atmosphere').toDataURL());
+  const first = await snapshot();
+  await sleep(700);
+  results.push({ check:'Background is animated', passed:first !== await snapshot() });
+  await page.eval(() => document.querySelector('.ff-atmosphere-control').click());
+  await sleep(100);
+  const paused = await snapshot();
+  await sleep(700);
+  results.push({ check:'Pause freezes background', passed:paused === await snapshot() });
+  await page.eval(() => document.querySelector('.ff-atmosphere-control').click());
+  await sleep(700);
+  results.push({ check:'Resume restarts background', passed:paused !== await snapshot() });
+  await page.screenshot({ path:'.taste-skill/ambient/desktop.jpg' });
+  await page.setViewport({width:390,height:844});
+  await page.goto('http://127.0.0.1:3000');
+  await page.screenshot({path:'.taste-skill/ambient/mobile.jpg'});
+  results.push(await page.eval(() => ({check:'Mobile has no page overflow',passed:document.documentElement.scrollWidth===innerWidth})));
+  const reduced = await browser.newPage({width:390,height:844,reducedMotion:true});
+  await reduced.goto('http://127.0.0.1:3000');
+  const staticFrame = await reduced.eval(() => document.querySelector('.ff-atmosphere').toDataURL());
+  await sleep(700);
+  results.push(await reduced.eval((before) => ({check:'Reduced motion is static',passed:before===document.querySelector('.ff-atmosphere').toDataURL() && document.querySelector('.ff-atmosphere-control').disabled}),staticFrame));
+  results.push({consoleErrors:[...page.consoleErrors,...reduced.consoleErrors]});
+  console.log(JSON.stringify(results,null,2));
+} finally { await browser.close(); }

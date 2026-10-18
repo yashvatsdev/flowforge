@@ -1,0 +1,34 @@
+@import "tailwindcss";
+@import "./design.css";
+@custom-variant dark (&:is(.dark *));
+@theme inline {
+  --color-background: var(--base);
+  --color-foreground: #e9edf1;
+  --color-border: var(--line);
+  --color-primary: #a8c7e6;
+  --color-primary-foreground: var(--base);
+  --color-muted: var(--raised);
+  --color-muted-foreground: #a8c7e6;
+  --color-accent: var(--raised);
+  --color-accent-foreground: #e9edf1;
+  --color-ring: #a8c7e6;
+  --radius: 0.5rem;
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+}
