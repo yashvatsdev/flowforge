@@ -1,0 +1,25 @@
+﻿.auth-page { min-height:100svh; display:grid; place-items:center; padding:32px 20px; }
+.auth-wrap { width:min(100%,460px); display:grid; gap:32px; }
+.auth-panel { padding:36px; display:grid; gap:24px; }
+.auth-panel h1 { font-size:clamp(28px,5vw,40px); line-height:1.15; letter-spacing:-.05em; }
+.auth-panel p { line-height:1.7; }
+.google-button { width:100%; justify-content:center; min-height:48px; }
+.cloud-status { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:10px 24px; border-bottom:1px solid var(--line); font-size:12px; }
+.cloud-status p { flex:1; min-width:180px; }
+.sidebar { overflow-y:auto; overscroll-behavior:contain; }
+.sidebar > * { flex-shrink:0; }
+.account-menu { position:relative; padding:16px 0; }
+.account-menu img { width:32px; height:32px; border-radius:4px; }
+.account-menu summary { cursor:pointer; display:flex; gap:10px; align-items:center; }
+.account-identity { flex:1; min-width:0; }
+.account-identity strong, .account-menu small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.account-menu small { color:var(--muted); }
+.account-menu summary > img, .account-chevron { flex-shrink:0; }
+.account-chevron { transform:rotate(180deg); }
+.account-menu[open] .account-chevron { transform:none; }
+.account-menu summary:focus-visible { outline:2px solid var(--blue); outline-offset:4px; border-radius:4px; }
+.account-actions { position:absolute; bottom:100%; inset-inline:0; z-index:2; display:grid; gap:4px; padding:8px; border:1px solid var(--line); border-radius:6px; background:var(--raised); box-shadow:0 8px 24px #0006; }
+.account-actions .text-btn { display:block; width:100%; padding:10px; text-align:left; }
+.signout-button { display:flex; align-items:center; gap:6px; min-height:36px; white-space:nowrap; }
+@media(max-width:760px){ .app-topbar { height:auto; min-height:67px; flex-wrap:wrap; padding-block:12px; } }
+@media(max-width:480px){ .auth-panel { padding:24px; } }

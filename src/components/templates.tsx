@@ -212,7 +212,7 @@ export function Templates() {
                 className="text-link"
                 onClick={() => {
                   const w = fromTemplate(t.index);
-                  saveWorkflow(w);
+                  void Promise.resolve(saveWorkflow(w)).catch(() => { /* The workspace save banner retains and reports failed drafts. */ });
                   router.push("/workflows/" + w.id);
                 }}
                 aria-label={`Use template ${t.name}`}

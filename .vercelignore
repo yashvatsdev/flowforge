@@ -1,0 +1,14 @@
+# Prevent CLI source uploads of local credentials, test clusters and artifacts.
+.git/
+node_modules/
+.env*
+.next*/
+.phase1-evidence/
+.phase2b-evidence/
+test-results/
+playwright-report/
+supabase/.temp/
+**/*.dump
+**/*.backup
+**/.pgpass
+**/pgpass.conf

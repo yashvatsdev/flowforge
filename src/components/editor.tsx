@@ -41,6 +41,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { RunWorkflowButton } from "./real-executions";
 import {
   simulate,
   graphError,
@@ -147,7 +148,8 @@ export default function Editor() {
   );
 }
 function Canvas({ workflow }: { workflow: Workflow }) {
-  const { saveWorkflow, record, settings } = useStore();
+  const { saveWorkflow, record, settings, cloud, syncStatus, markAction } = useStore();
+  useEffect(() => { markAction?.("explored"); }, [markAction]);
   const [nodes, setNodes] = useState<FlowNode[]>(() =>
     structuredClone(workflow.nodes),
   );
@@ -199,12 +201,22 @@ function Canvas({ workflow }: { workflow: Workflow }) {
     }),
     [workflow, name, description, nodes, edges],
   );
-  const save = useCallback(() => {
-    saveWorkflow(snapshot());
+  const pendingSnapshot = useRef("");
+  const signature = useCallback(() => {
+    const w = snapshot();
+    return JSON.stringify({name:w.name,description:w.description,nodes:w.nodes,edges:w.edges});
+  },[snapshot]);
+  useEffect(() => { pendingSnapshot.current=signature(); },[signature]);
+  const save = useCallback(async () => {
+    try {
+    const sentSignature=signature();
+    await saveWorkflow(snapshot());
+    if(pendingSnapshot.current !== sentSignature) return;
     setDirty(false);
     setSavedRecently(true);
-    setMessage("All changes saved to this browser.");
-  }, [saveWorkflow, snapshot]);
+    setMessage(cloud ? "Changes saved to your workspace." : "All changes saved to this browser.");
+    } catch { setMessage("Save needs attention. Your draft is preserved."); }
+  }, [saveWorkflow, snapshot, signature, cloud]);
   useEffect(() => {
     if (!savedRecently) return;
     const timer = setTimeout(() => setSavedRecently(false), 1800);
@@ -241,10 +253,10 @@ function Canvas({ workflow }: { workflow: Workflow }) {
     return () => document.removeEventListener("click", flush, true);
   }, [dirty, save]);
   useEffect(() => {
-    if (!dirty || running) return;
+    if (!dirty || running || syncStatus === "error" || syncStatus === "conflict") return;
     const timer = setTimeout(save, 800);
     return () => clearTimeout(timer);
-  }, [dirty, running, save]);
+  }, [dirty, running, save, syncStatus]);
   useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => {
       if (dirty) {
@@ -377,11 +389,11 @@ function Canvas({ workflow }: { workflow: Workflow }) {
     );
     setDirty(true);
   };
-  const run = () => {
+  const run = async () => {
     try {
       const w = snapshot();
       const result = simulate(w);
-      saveWorkflow(w);
+      await saveWorkflow(w);
       setDirty(false);
       setNodes((ns) =>
         ns.map((n) => ({ ...n, data: { ...n.data, status: undefined } })),
@@ -424,11 +436,12 @@ function Canvas({ workflow }: { workflow: Workflow }) {
           <span>
             <Status status={workflow.active ? "active" : "draft"} />
             <span className={`micro ${savedRecently && !dirty ? "saved-feedback" : ""}`}>
-              {dirty ? "Unsaved changes" : savedRecently ? "Saved just now" : "Saved locally"}
+              {dirty ? "Unsaved changes" : savedRecently ? "Saved just now" : cloud ? "Saved to workspace" : "Saved locally"}
             </span>
           </span>
         </div>
         <div className="editor-buttons">
+          <RunWorkflowButton workflowId={workflow.id} blocked={dirty || running || (!!cloud && syncStatus !== "saved")} />
           <button className="btn" onClick={save} disabled={running}>
             <Save size={15} />
             Save
@@ -858,7 +871,7 @@ function Canvas({ workflow }: { workflow: Workflow }) {
             )}
             {lastRun && (
               <Link
-                href={`/executions?run=${lastRun.id}`}
+                href={`/executions?view=simulation&run=${lastRun.id}`}
                 className="text-link console-link"
               >
                 Open full execution <ArrowUpRight size={13} />

@@ -1,5 +1,17 @@
 @import "tailwindcss";
 @import "./design.css";
+.real-start { display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
+.real-start small { font-size:10px; max-width:180px; color:var(--muted); }
+.execution-feedback { padding:16px; border:1px solid var(--line); border-radius:10px; margin:12px 0; }
+.execution-input { display:flex; flex-direction:column; gap:10px; margin:20px 0; }
+.execution-input textarea { width:100%; padding:12px; border:1px solid var(--line); border-radius:8px; background:var(--base); color:inherit; font-family:monospace; }
+.execution-json { white-space:pre-wrap; overflow-wrap:anywhere; max-height:300px; overflow:auto; padding:12px; font-size:12px; background:var(--base); }
+.execution-id { overflow-wrap:anywhere; font-size:12px; }
+.real-status.succeeded { color:#9dcdbb; }
+.real-status.failed,.real-status.timed_out { color:#e3a4a4; }
+.real-status.running,.real-status.queued { color:#a8c7e6; }
+.tabs button[aria-pressed="true"] { color:var(--text); background:var(--raised); }
+@media(max-width:700px) { .editor-buttons { flex-wrap:wrap; } .real-start small { max-width:135px; } .list-tools { flex-wrap:wrap; } }
 @custom-variant dark (&:is(.dark *));
 @theme inline {
   --color-background: var(--base);

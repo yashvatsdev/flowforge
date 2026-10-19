@@ -13,7 +13,14 @@ import {
 import { useStore } from "@/lib/store";
 import { Status, Empty } from "./shared";
 import { Dialog } from "./dialog";
+import { RealExecutions } from "./real-executions";
 export function Executions() {
+  const params = useSearchParams(), router = useRouter();
+  const { cloud } = useStore();
+  const simulation = !cloud || params.get("view") === "simulation";
+  return <><div className="tabs" aria-label="Execution source"><button aria-pressed={!simulation} onClick={() => router.push("/executions")}>Real executions</button><button aria-pressed={simulation} onClick={() => router.push("/executions?view=simulation")}>Local simulations</button></div>{simulation ? <SimulationExecutions /> : <RealExecutions />}</>;
+}
+function SimulationExecutions() {
   const { executions, workflows } = useStore();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
@@ -27,7 +34,7 @@ export function Executions() {
       (status === "all" || e.status === status),
   );
   const pages = Math.ceil(filtered.length / 10);
-  const close = () => router.replace("/executions", { scroll: false });
+  const close = () => router.replace("/executions?view=simulation", { scroll: false });
   const exportRun = () => {
     if (!selected) return;
     const url = URL.createObjectURL(
@@ -125,7 +132,7 @@ export function Executions() {
                         <button
                           className="workflow-name text-left"
                           onClick={() =>
-                            router.push(`/executions?run=${e.id}`, {
+                            router.push(`/executions?view=simulation&run=${e.id}`, {
                               scroll: false,
                             })
                           }
@@ -157,7 +164,7 @@ export function Executions() {
                           className="icon-btn"
                           aria-label={`Inspect run ${e.id.slice(0, 8)}`}
                           onClick={() =>
-                            router.push(`/executions?run=${e.id}`, {
+                            router.push(`/executions?view=simulation&run=${e.id}`, {
                               scroll: false,
                             })
                           }
@@ -197,7 +204,7 @@ export function Executions() {
         )}
       </section>
       <p className="page-footnote">
-        Run history stores up to 200 local executions. Durations represent
+        Run history stores up to 200 simulated executions. Durations represent
         deterministic simulated latency.
       </p>
       {selected && (

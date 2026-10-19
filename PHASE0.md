@@ -1,6 +1,6 @@
 ﻿# Phase 0 stabilization report — October 19, 2026
 
-Status: implemented and ready for review/approval, with the development dependency advisory noted below. Phase 1 has not started. Nothing was deployed, committed, or pushed. The existing palette, fonts, layouts, animations, and Magic UI sources were preserved.
+Original Phase 0 completion snapshot: implemented and ready for review/approval, with the development dependency advisory noted below. Phase 1 had not started at that point; it was subsequently approved and implemented as documented in `PHASE1.md`. Nothing was deployed, committed, or pushed. The existing palette, fonts, layouts, animations, and Magic UI sources were preserved.
 
 ## Defects and fixes
 
@@ -77,4 +77,18 @@ No remaining failures in the requested stabilization checks. The design and loca
 
 The newly required `eslint-config-next` dependency currently introduces five high-severity **development-only** npm audit entries, all from the `braces` → `micromatch` → `fast-glob` → Next lint plugin/config chain. The registry's latest `braces` version is 3.0.3, which remains in the advisory range; npm proposes downgrading Next's lint config to 14.2.35, an incompatible major. No forced downgrade or unverified dependency patch was applied. These advisories do not appear in the production-only audit. They should be revisited when compatible upstream fixes are released.
 
-Phase 0 is ready for approval with that tooling caveat disclosed. Phase 1 requires separate approval and has not been started.
+At the original handoff, Phase 0 was ready for approval with that tooling caveat disclosed. Phase 1 required separate approval; that approval and its subsequent implementation are recorded in `PHASE1.md`.
+
+## Stabilization recheck against the current project
+
+The user resubmitted the Phase 0 brief after Phase 1 implementation. This pass preserves the existing approved authentication/database functionality and checks the stabilization requirements against the current architecture. No authentication, database, external service, dependency, application page, or visual redesign was introduced during this recheck.
+
+Inspection confirmed the existing guarded local restore/persistence, raw-document recovery, explicit reset/archive, shared bounded backup validator, iterative graph traversal, synchronized editor selection, hidden native import input, and 25-row load-more mechanism remain present. The original defect root causes and fixes are listed in the table above; no new application defect was identified in those paths during inspection.
+
+One regression-coverage gap was corrected: the original browser recovery cases targeted the pre-authentication `/settings` page and were no longer part of the active suite. Three equivalent cases now exercise the actual public legacy-recovery entry at `/`, covering corrupt JSON, unsupported versions and malformed documents. Each verifies exact raw preservation across reload, byte-exact export, canceled reset leaving data untouched, explicit confirmed reset, and archival of the original document. The active Settings tests also open the native import picker at 1440/768/390px; the over-100-workflow test now additionally exercises search, duplicate, confirmed delete and active/draft filters.
+
+Files changed in this recheck: `tests/browser/phase1.spec.ts`, `PHASE0.md`, and the current verification summary in `PHASE1.md`. Application runtime code, existing styles/animations, account data and credentials are unchanged. The shared unit cases continue covering valid existing backups, schema/configuration/identifier/graph/history failures, bounds and iterative traversal. Active browser cases retain editor selection, connections, autosave/reload and simulation checks.
+
+Fresh validation: `npm.cmd run validate:browser` passed TypeScript, ESLint, all 67 unit/local PostgreSQL tests, the production build, and all 21 browser tests (53.4 seconds for the browser suite). `git diff --check` passed. Current browser studio tests use the isolated local Auth fixture and PGlite SQL service because the approved project now requires authentication; they do not imply a new hosted Supabase or Google verification result. The legacy recovery cases run without authentication against the public local workspace.
+
+The Phase 0 stabilization recheck is ready for approval. No remaining failure was found in its requested acceptance checks. The historical tooling advisory above was not re-audited during this pass; Phase 1's separate provider/configuration limitations remain tracked in `PHASE1.md`. No new phase was started, and nothing was deployed, committed or pushed.

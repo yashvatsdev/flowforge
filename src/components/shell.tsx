@@ -14,6 +14,7 @@ import {
   X,
   ArrowRight,
   Command,
+  LogOut,
 } from "lucide-react";
 import { Logo } from "./shared";
 import { useStore } from "@/lib/store";
@@ -48,7 +49,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     query.addEventListener("change", update);
     return () => query.removeEventListener("change", update);
   }, []);
-  const { ready, settings, notice, workflows } = useStore();
+  const { ready, settings, notice, workflows, cloud, account, executionEnabled } = useStore();
   const title = links.find(([p]) => path.startsWith(p))?.[1] || "Workspace";
   return (
     <div className="app-shell">
@@ -74,7 +75,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </span>
           <span>
             <strong>{settings.workspace}</strong>
-            <small>Local workspace</small>
+            <small>{cloud ? "Private cloud workspace" : "Local workspace"}</small>
           </span>
           <ChevronDown size={14} />
         </Link>
@@ -103,7 +104,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span className="live-dot" />
             <strong>A space to experiment.</strong>
             <p>
-              Everything runs as a simulation. Your work stays in this browser.
+              {cloud ? executionEnabled ? "Real runs use saved workflows. Local simulation remains separate." : "Real execution is disabled. Workflows and local simulation remain available." : "Everything runs as a simulation. Your work stays in this browser."}
             </p>
             <Link href="/templates">
               Find your starting point <ArrowRight size={14} />
@@ -112,7 +113,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="back-site">
             Visit the studio <ArrowUpRight size={15} />
           </Link>
-          <Link href="/settings" className="profile">
+          {cloud && account ? <details className="account-menu"><summary>
+            {/* Google supplies a user-controlled remote avatar; use the native image with no referrer. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {account.avatar && /^https:\/\//.test(account.avatar) ? <img src={account.avatar} referrerPolicy="no-referrer" alt="" /> : <span className="avatar-small">{account.name[0] || "G"}</span>}
+            <span className="account-identity"><strong>{account.name || "Google account"}</strong><small>{account.email}</small></span><ChevronDown size={14} className="account-chevron" aria-hidden="true" />
+          </summary><div className="account-actions"><Link href="/settings" className="text-btn">Workspace preferences</Link><form action="/auth/signout" method="post"><button className="text-btn">Sign out</button></form></div></details> :           <Link href="/settings" className="profile">
             <span>
               {settings.name
                 .split(" ")
@@ -125,7 +131,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <small>Personal account · demo</small>
             </div>
             <Settings size={15} />
-          </Link>
+          </Link>}
         </div>
       </aside>
       {open && (
@@ -155,7 +161,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div>
             <span className="demo-badge">
               <span />
-              SIMULATION MODE
+              {cloud && executionEnabled ? "LOCAL EXECUTION" : "SIMULATION MODE"}
             </span>
             <Link
               href="/settings"
@@ -164,6 +170,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             >
               {settings.name[0]}
             </Link>
+            {cloud && <form action="/auth/signout" method="post"><button className="text-btn signout-button"><LogOut size={14} aria-hidden="true" />Sign out</button></form>}
           </div>
         </header>
         <main
@@ -189,7 +196,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <footer className="app-footer">
           <span>FLOWFORGE / PERSONAL WORKSPACE</span>
           <span>
-            <span className="live-dot" /> Local storage · frontend simulation
+            <span className="live-dot" /> {cloud ? executionEnabled ? "Cloud storage · real runs and local simulation" : "Cloud storage · real execution disabled" : "Local storage · frontend simulation"}
           </span>
         </footer>
       </div>

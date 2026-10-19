@@ -13,16 +13,18 @@ import {
   GitBranch,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { RecentRealRuns } from "./real-executions";
 import { NewWorkflowButton, WorkflowList } from "./workflow-list";
 import { Status } from "./shared";
 import { BlurFade } from "./ui/blur-fade";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 export function Dashboard() {
-  const { workflows, executions, settings } = useStore();
+  const { workflows, executions, settings, cloud, onboarding } = useStore();
   const systemReduced = useReducedMotion();
   const quiet = !!systemReduced || settings.reduceMotion;
   const success = executions.filter((e) => e.status === "success").length;
   const active = workflows.filter((w) => w.active).length;
+  const simulationHref = cloud ? (workflows[0] ? `/workflows/${workflows[0].id}` : "/templates") : "/workflows/order-intake";
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - 6 + i);
@@ -43,13 +45,13 @@ export function Dashboard() {
       Icon: Workflow,
     },
     {
-      label: "Executions",
+      label: "Simulations",
       value: String(executions.length).padStart(2, "0"),
       note: "Manually simulated runs",
       Icon: Activity,
     },
     {
-      label: "Success rate",
+      label: "Simulation success",
       value: executions.length
         ? `${Math.round((success / executions.length) * 100)}%`
         : "—",
@@ -59,7 +61,7 @@ export function Dashboard() {
       Icon: CheckCheck,
     },
     {
-      label: "Average duration",
+      label: "Simulation duration",
       value: executions.length
         ? `${Math.round(executions.reduce((s, e) => s + e.duration, 0) / executions.length)} ms`
         : "—",
@@ -70,18 +72,18 @@ export function Dashboard() {
   const progress = [
     {
       label: "Explore a starter workflow",
-      href: "/workflows/order-intake",
-      done: true,
+      href: cloud ? (workflows[0] ? `/workflows/${workflows[0].id}` : "/templates") : "/workflows/order-intake",
+      done: cloud ? !!onboarding?.includes("explored") : false,
     },
     {
       label: "Make it your own",
       href: "/workflows",
-      done: workflows.length > 3,
+      done: cloud ? !!onboarding?.includes("edited") : workflows.length > 3,
     },
     {
       label: "Run your first simulation",
-      href: "/workflows/order-intake",
-      done: executions.length > 0,
+      href: cloud ? (workflows[0] ? `/workflows/${workflows[0].id}` : "/templates") : "/workflows/order-intake",
+      done: cloud ? !!onboarding?.includes("simulated") : executions.length > 0,
     },
   ];
   return (
@@ -119,8 +121,8 @@ export function Dashboard() {
         <section className="panel activity-panel">
           <div className="panel-heading">
             <div>
-              <h2>Execution activity</h2>
-              <p>Manually initiated runs in this browser.</p>
+              <h2>Simulation activity</h2>
+              <p>Local simulated runs in this workspace.</p>
             </div>
             <span className="period-tag">Last 7 days</span>
           </div>
@@ -151,14 +153,14 @@ export function Dashboard() {
               <div className="chart-empty">
                 <Activity size={18} />
                 <span>No executions in the last seven days.</span>
-                <Link href="/workflows/order-intake">
+                <Link href={simulationHref}>
                   Run the starter workflow <ArrowRight size={13} />
                 </Link>
               </div>
             )}
           </div>
           <div className="chart-legend">
-            <i /> Successful <i className="chart-failure-key" /> Failed <span>Simulated runs · this browser</span>
+            <i /> Successful <i className="chart-failure-key" /> Failed <span>Simulated runs · this workspace</span>
           </div>
         </section>
         <section className="panel getting-started">
@@ -210,9 +212,9 @@ export function Dashboard() {
         <WorkflowList compact />
       </section>
       <div className="dashboard-lower">
-        <section className="panel recent-panel">
+        {cloud ? <RecentRealRuns /> : <section className="panel recent-panel">
           <div className="panel-heading">
-            <h2>Recent executions</h2>
+            <h2>Recent simulations</h2>
             <Link href="/executions" className="text-link">
               All runs <ArrowRight size={14} />
             </Link>
@@ -220,7 +222,7 @@ export function Dashboard() {
           {executions.length ? (
             executions.slice(0, 3).map((e) => (
               <Link
-                href={`/executions?run=${e.id}`}
+                href={`/executions?view=simulation&run=${e.id}`}
                 className="recent-run"
                 key={e.id}
               >
@@ -244,12 +246,12 @@ export function Dashboard() {
             <div className="recent-empty">
               <Play size={20} />
               <p>No runs yet. Your canvas is waiting.</p>
-              <Link href="/workflows/order-intake">
+              <Link href={simulationHref}>
                 Try your first simulation <ArrowUpRight size={13} />
               </Link>
             </div>
           )}
-        </section>
+        </section>}
         <Link href="/templates" className="template-promo">
           <span className="eyebrow">A GOOD PLACE TO BEGIN</span>
           <Layers size={24} />

@@ -10,3 +10,22 @@ playwright-report/
 .env.*.local
 .next/
 node_modules/
+
+.next-phase1/
+.next-phase2c-build/
+.next-phase2d-build/
+supabase/.temp/
+.phase1-evidence/
+.phase2b-evidence/
+
+# Database exports and local recovery material must stay outside Git.
+*.dump
+*.backup
+*.sql.gz
+.pgpass
+pgpass.conf
+.pg_service.conf
+pg_service.conf
+FlowForgeRecovery/
+backups/
+recovery-data/

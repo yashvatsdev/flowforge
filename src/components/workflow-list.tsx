@@ -186,7 +186,7 @@ export function WorkflowList({ compact = false }: { compact?: boolean }) {
                             : "Mark active (manual simulation only)"
                         }
                         onClick={() => {
-                          saveWorkflow({ ...w, active: !w.active });
+                          void Promise.resolve(saveWorkflow({ ...w, active: !w.active })).catch(() => setMessage("Save needs attention. Your draft is preserved."));
                           setMessage(
                             w.active
                               ? "Workflow paused."

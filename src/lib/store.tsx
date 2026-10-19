@@ -7,6 +7,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import { Dialog } from "../components/dialog";
 import { readWorkspace, persistWorkspace, preserveRecovery, STORAGE_KEY, type State, type Settings, type WorkspaceDocument } from "./workspace";
 export { validState } from "./workspace";
@@ -15,77 +16,9 @@ import {
   simulate,
   type Workflow,
   type Execution,
-  type FlowNode,
 } from "./engine";
-export function starter(
-  id = "order-intake",
-  name = "Order intake → team handoff",
-): Workflow {
-  const spec = [
-    ["trigger", "Order received", 40, 180],
-    ["transform", "Normalize payload", 310, 180],
-    ["condition", "High-value order?", 580, 180],
-    ["http", "Create CRM record", 850, 80],
-    ["notification", "Notify operations", 1120, 80],
-    ["notification", "Standard queue", 850, 300],
-  ] as const;
-  const nodes: FlowNode[] = spec.map(([kind, label, x, y], i) => ({
-    id: `n${i}`,
-    type: "forge",
-    position: { x, y },
-    data: {
-      kind,
-      label,
-      config: {
-        ...defaults[kind],
-        ...(i === 5 ? { channel: "#standard-orders" } : {}),
-      },
-    },
-  }));
-  const edges = [
-    { id: "e01", source: "n0", target: "n1" },
-    { id: "e12", source: "n1", target: "n2" },
-    {
-      id: "e23",
-      source: "n2",
-      target: "n3",
-      sourceHandle: "true",
-      label: "Yes",
-    },
-    { id: "e34", source: "n3", target: "n4" },
-    {
-      id: "e25",
-      source: "n2",
-      target: "n5",
-      sourceHandle: "false",
-      label: "No",
-    },
-  ];
-  return {
-    id,
-    name,
-    description: "Route every order to the right people. Automatically.",
-    active: true,
-    nodes,
-    edges,
-    updatedAt: "2026-10-18T08:00:00.000Z",
-  };
-}
-export function seeds(): Workflow[] {
-  return [
-    starter(),
-    {
-      ...starter("lead-enrichment", "Inbound lead enrichment"),
-      description: "Enrich inbound leads and prepare a sales handoff.",
-      active: false,
-    },
-    {
-      ...starter("daily-digest", "Daily operations digest"),
-      description: "Collect, summarize, and share the daily numbers.",
-      active: false,
-    },
-  ];
-}
+import { starter, seeds } from "./seeds";
+export { starter, seeds } from "./seeds";
 const initial: State = {
   version: 1,
   workflows: seeds(),
@@ -105,10 +38,17 @@ function download(raw: string, filename: string) {
   anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-type Store = State & {
+export type Store = State & {
   ready: boolean;
   notice: string;
-  saveWorkflow: (w: Workflow) => void;
+  cloud?: boolean;
+  executionEnabled?: boolean;
+  workspaceRevision?: number;
+  syncStatus?: string;
+  onboarding?: string[];
+  account?: { id: string; name: string; email: string; avatar: string };
+  markAction?: (action: string) => void;
+  saveWorkflow: (w: Workflow) => void | Promise<void>;
   deleteWorkflow: (id: string) => void;
   duplicateWorkflow: (id: string) => string;
   addWorkflow: (name: string) => string;
@@ -116,11 +56,12 @@ type Store = State & {
   saveSettings: (s: Settings) => void;
   reset: () => void;
   exportData: () => void;
-  importData: (text: string) => boolean;
+  importData: (text: string) => boolean | Promise<boolean>;
   clearExecutions: () => void;
 };
-const Context = createContext<Store | null>(null);
+export const Context = createContext<Store | null>(null);
 export function Provider({ children }: { children: ReactNode }) {
+  const path = usePathname();
   const [state, setState] = useState<State>(initial);
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState("");
@@ -247,7 +188,7 @@ export function Provider({ children }: { children: ReactNode }) {
       }
     },
   };
-  const recoveryScreen = recovery?.status === "recovery" ? (
+  const recoveryScreen = recovery?.status === "recovery" && path === "/" ? (
     <main id="main" className="workspace-main">
       <section className="panel settings-panel" aria-labelledby="recovery-title">
         <h1 id="recovery-title" tabIndex={-1}>Your workspace needs recovery</h1>

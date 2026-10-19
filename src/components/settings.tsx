@@ -40,7 +40,7 @@ export function SettingsPage() {
               name: form.name.trim(),
               workspace: form.workspace.trim(),
             });
-            setMessage("Preferences saved to this browser.");
+            setMessage(store.cloud ? "Preferences queued for saving." : "Preferences saved to this browser.");
           }}
         >
           <section className="panel settings-panel">
@@ -50,7 +50,7 @@ export function SettingsPage() {
               </span>
               <div>
                 <h2>Your profile</h2>
-                <p>Personalize your local workspace.</p>
+                <p>Personalize your workspace.</p>
               </div>
             </div>
             <div className="form-grid">
@@ -88,8 +88,7 @@ export function SettingsPage() {
               </label>
             </div>
             <p className="micro">
-              Profile details are for this demo only. No account or
-              authentication is created.
+              {store.cloud ? "Your sign-in identity comes from Google. These preferences personalize your workspace." : "Profile details are for this demo only. No account or authentication is created."}
             </p>
           </section>
           <section className="panel settings-panel">
@@ -160,12 +159,12 @@ export function SettingsPage() {
                 <Database size={18} />
               </span>
               <div>
-                <h2>Your data, your browser.</h2>
-                <p>A workspace without a server.</p>
+                <h2>{store.cloud ? "Your workspace, saved." : "Your data, your browser."}</h2>
+                <p>{store.cloud ? "Private to your signed-in account." : "A workspace without a server."}</p>
               </div>
             </div>
             <p className="muted small">
-              Workflows, settings, and up to 200 executions are stored locally.
+              {store.cloud ? "Workflows, preferences, and up to 200 simulated executions are saved to your account." : "Workflows, settings, and up to 200 executions are stored locally."}
               Export a backup before switching browsers or clearing site data.
             </p>
             <div className="data-summary">
@@ -211,7 +210,7 @@ export function SettingsPage() {
               }}
             />
             <p className="micro">
-              Imports replace this local workspace after confirmation.
+              {store.cloud ? "Imports add copies after confirmation; local originals remain untouched." : "Imports replace this local workspace after confirmation."}
             </p>
           </section>
           <section className="panel settings-panel danger-zone">
@@ -236,8 +235,8 @@ export function SettingsPage() {
           <div className="settings-note">
             <Info size={16} />
             <span>
-              This is a frontend demonstration. Requests, notifications, and
-              integrations are simulated. There are no API keys to configure.
+              Requests, notifications, and integrations are simulated.
+              There are no connector API keys to configure.
             </span>
           </div>
         </aside>
@@ -265,7 +264,7 @@ export function SettingsPage() {
               onClick={() => {
                 if (confirm === "reset") {
                   store.reset();
-                  setForm({
+                  if (!store.cloud) setForm({
                     name: "Alex Morgan",
                     email: "alex@example.com",
                     workspace: "Personal workspace",
@@ -291,7 +290,7 @@ export function SettingsPage() {
           onClose={() => setPendingImport(null)}
         >
           <p className="muted">
-            Importing replaces all local workflows, executions, and preferences.
+            {store.cloud ? "Importing adds copies of workflows and simulation history. Your existing cloud preferences and local backup are preserved." : "Importing replaces all local workflows, executions, and preferences."}
             Export a backup first to keep your current work.
           </p>
           <div className="modal-actions">
@@ -300,14 +299,14 @@ export function SettingsPage() {
             </button>
             <button
               className="btn primary"
-              onClick={() => {
-                const ok = store.importData(pendingImport);
+              onClick={async () => {
+                const ok = await store.importData(pendingImport);
                 setMessage(
                   ok
                     ? "Workspace imported."
                     : "This file is not a valid FlowForge workspace backup.",
                 );
-                if (ok) {
+                if (ok && !store.cloud) {
                   try {
                     setForm(JSON.parse(pendingImport).settings);
                   } catch {}

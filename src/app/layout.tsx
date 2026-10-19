@@ -5,6 +5,7 @@ import "./globals.css";
 import "./feature-previews.css";
 import "./refinement.css";
 import "./surfaces.css";
+import "./auth.css";
 import "@fontsource-variable/manrope";
 import "@fontsource-variable/dm-sans";
 import "@fontsource/ibm-plex-mono/400.css";

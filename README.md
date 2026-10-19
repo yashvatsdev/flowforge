@@ -8,7 +8,7 @@ Requires Node.js 20.19+, 22.13+, or 24+ for the ESLint 10 toolchain. Browser reg
 
 ```sh
 npm install
-npm run dev -- --port 43819
+npm run dev -- --port 3001
 ```
 
 On Windows PowerShell with script execution disabled, use `npm.cmd` in place of `npm`.
@@ -17,20 +17,20 @@ On Windows PowerShell with script execution disabled, use `npm.cmd` in place of 
 npm run typecheck
 npm test
 npm run build
-npm start -- --port 43820
+npm start -- --port 3001
 ```
 
-No environment variables, database, credentials, or external services are required. Fontsource bundles the fonts locally. Run `npm run validate` for TypeScript, ESLint, unit regressions, and a production build. Run `npm run validate:browser` to include the Playwright browser regressions. On a machine without Chrome, install a Playwright browser and set `PLAYWRIGHT_CHANNEL=chromium`. Browser tests launch their own production server on port 43821 and use isolated browser storage. See PHASE0.md for stabilization details.
+The public landing demo remains local. Studio routes require Supabase Google OAuth and the Phase 1 migration; see PHASE1.md for setup, security boundaries, and live-verification status. Fontsource bundles the fonts locally. Run `npm run validate` for TypeScript, ESLint, unit regressions, and a production build. Run `npm run validate:browser` to include the Playwright browser regressions. On a machine without Chrome, install a Playwright browser and set `PLAYWRIGHT_CHANNEL=chromium`. Browser tests launch an isolated development server on port 43821, a local Auth REST fixture, and PostgreSQL/PGlite; they do not claim live Supabase/Google verification. See PHASE0.md for stabilization details.
 
 ## Routes and behavior
 
 | Route | Working features |
 | --- | --- |
 | `/` | Interactive six-node order simulation, amount-dependent routing, node output inspector, pause/speed/manual stepping, preview run count, use-case tabs, FAQ, workspace links |
-| `/dashboard` | Browser-backed workflow metrics, seven-day activity, first steps, workflow actions, recent executions |
+| `/dashboard` | Cloud workspace, labeled simulation metrics, first steps, workflow actions, recent persisted real runs when available |
 | `/workflows` | Create, search, filter, activate/pause, duplicate, delete, and edit workflows |
 | `/workflows/[id]` | React Flow canvas, node library, ports, branching connectors, inspector, zoom, keyboard editing, autosave, manual simulation, step outputs |
-| `/executions` | Search, status filters, pagination, step outputs, JSON export, direct links via `?run=<id>` |
+| `/executions` | Real run history/details/cancellation; separate local simulation history via `?view=simulation` |
 | `/templates` | Six editable templates with text/category filtering |
 | `/settings` | Local profile, workspace name, reduced motion, JSON backup export/import, history clearing, workspace reset |
 
@@ -41,7 +41,7 @@ No environment variables, database, credentials, or external services are requir
 3. Set the amount back to 149 and enable the HTTP node's simulated failure. Downstream work is skipped after the simulated 503.
 4. Open execution history and inspect a step's payload.
 5. Add a transform from the node library, connect it, configure it, and reload. The editor autosaves changes after 800ms and flushes when following links. A manual Save button is also available.
-6. Export a JSON backup in Settings before clearing browser storage. Import validates the backup and requires confirmation because it replaces the workspace.
+6. Export a JSON copy in Settings before clearing browser drafts. Authenticated import validates and adds copies, preserving existing cloud workflows. Explicit draft recovery can replace the cloud document and requires confirmation.
 
 On phones and tablets, the editor opens with readable nodes and a pannable canvas; drag the background to explore and use the zoom/fit controls. The inspector opens on node selection. The node library scrolls horizontally on phones and supports click-to-add. React Flow supports keyboard node selection, arrow-key repositioning, and Delete/Backspace removal. Workflow tables scroll within their own keyboard-focusable region.
 
@@ -55,11 +55,11 @@ Completed steps reveal their actual input/output payloads. Added, updated, and r
 
 The dashboard's seven-day activity bars separate successful and failed runs in green/coral. Hover or keyboard-focus a day for its actual counts. Saves show a short “Saved just now” confirmation.
 
-This is a frontend application. HTTP requests and notifications never contact their configured destinations. Webhooks use sample payloads. Active/draft labels do not schedule background jobs. Executions are manually initiated and require the editor to remain open. The landing demo uses the same pure simulation engine, but its preview runs are separate from workspace history.
+Local simulation never contacts configured HTTP/notification destinations. Webhooks use sample payloads. Active/draft labels do not schedule jobs. Simulation requires the editor to remain open. Separately enabled real runs use durable database checkpoints and workers; hosted execution remains disabled. The landing demo uses the pure simulation engine with preview runs separate from workspace history.
 
 The engine validates one trigger, graph connectivity, cycles, configuration, and URLs. It evaluates a deterministic topological order, routes using amount ≥ threshold, skips unused branches, and stops subsequent work after failure. It uses a single shared payload rather than a parallel production execution model.
 
-Data is versioned under `flowforge:v1` in localStorage. The latest 200 workspace executions are retained. Storage is browser- and origin-specific; it does not sync between devices or local ports. Profile settings do not create an account.
+The public demo and legacy local document use `flowforge:v1`; local storage is browser/origin-specific. The authenticated studio persists workflows, preferences and up to 200 simulation records in the user's cloud workspace, with account-keyed browser recovery drafts. Real runs are separate persisted execution records. Profile display settings do not create another account.
 
 ## Design implementation
 
@@ -82,3 +82,11 @@ See [VERIFICATION.md](VERIFICATION.md) for validation and [DESIGN_REVIEW.md](DES
 Invalid JSON, unsupported versions, or malformed existing documents open a recovery screen instead of silently replacing saved work. Export preserves the exact original text. Reset requires confirmation and saves a second raw copy under `flowforge:recovery`; a failed archival write aborts reset. If the initial storage read fails, persistence remains disabled for that session.
 
 Version 1 remains the only released document schema; no speculative migration is applied to unrecognized versions. Imports accept valid version-1 backups within 5 MB, 1,000 workflows, 1,000 nodes and 5,000 edges per workflow, and 200 executions. Identifiers, configurations, ports, graph cycles, and historical step payloads are validated. Disconnected editor drafts can round-trip; running them still requires every node to connect to the trigger. Historical runs remain valid after their workflow or nodes are deleted.
+
+## Phase 1 authenticated workspaces
+
+Use `http://localhost:3001/login` consistently with `APP_ORIGIN`. Google is the only application sign-in flow. The authenticated workspace uses Supabase PostgreSQL with RLS, revision-checked saves, explicit retry/conflict recovery, persistent simulation history and preferences. Local backups are offered for confirmed, additive import and are preserved.
+
+`npm run verify:config` reports redacted configuration readiness; it never prints keys or secrets. `npm run validate:browser` runs TypeScript, lint, unit/local PostgreSQL integration tests, a production build and browser/API tests. Browser OAuth/session tests use controlled fixtures; the hosted Google/Supabase checks remain separately documented in [PHASE1.md](PHASE1.md).
+
+Phase 2E security/staging results are in [PHASE2E.md](PHASE2E.md). The [deployment runbook](docs/PHASE3_DEPLOYMENT_RUNBOOK.md) separates protected disabled deployment, migration application, worker activation and public launch approvals. Hosted deployment/execution remain NO-GO; configuration preparation does not authorize deployment.

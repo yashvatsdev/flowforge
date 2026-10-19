@@ -1,0 +1,2 @@
+# Preserve the exact reviewed bytes and SHA-256 of immutable SQL migrations.
+supabase/migrations/*.sql -text whitespace=cr-at-eol
