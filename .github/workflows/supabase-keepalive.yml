@@ -1,0 +1,69 @@
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: '17 2,14 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping the Supabase database
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          set -euo pipefail
+
+          # Built-in Python only; reject missing/malformed or privileged credentials.
+          python3 - <<'PY'
+          import base64
+          import json
+          import os
+          import re
+
+          url = os.environ.get("SUPABASE_URL", "")
+          key = os.environ.get("SUPABASE_KEY", "")
+          if not re.fullmatch(r"https://[a-z]{20}\.supabase\.co/?", url):
+              raise SystemExit("::error::Set SUPABASE_URL to the hosted project's HTTPS URL.")
+          if not re.fullmatch(r"sb_publishable_[A-Za-z0-9_-]+", key):
+              try:
+                  if not re.fullmatch(r"[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+", key):
+                      raise ValueError()
+                  payload = key.split(".")[1]
+                  claims = json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4)))
+                  if claims.get("role") != "anon":
+                      raise ValueError()
+              except (ValueError, TypeError, AttributeError):
+                  raise SystemExit("::error::Set SUPABASE_KEY to a publishable or legacy anon key only.")
+          PY
+
+          # apikey supports publishable and legacy anon keys. Never use a privileged
+          # key or put a publishable key in Authorization: Bearer. No redirect following.
+          # Pass the key on stdin, rather than exposing it in curl's process arguments.
+          response="$(curl --silent --show-error --fail \
+            --proto '=https' --tlsv1.2 \
+            --connect-timeout 10 --max-time 20 \
+            --retry 2 --retry-delay 5 --retry-max-time 60 \
+            --request POST \
+            --header 'Content-Type: application/json' \
+            --header 'Accept: application/json' \
+            --config - --data '{}' \
+            "${SUPABASE_URL%/}/rest/v1/rpc/keep_alive" <<EOF
+          header = "apikey: ${SUPABASE_KEY}"
+          EOF
+          )"
+          if [[ "$response" != '1' ]]; then
+            echo '::error::Unexpected keep_alive response; expected 1.'
+            exit 1
+          fi
+          echo 'Supabase database ping succeeded.'
