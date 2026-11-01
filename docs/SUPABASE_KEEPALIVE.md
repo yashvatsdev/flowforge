@@ -65,8 +65,8 @@ Runs happen on GitHub-hosted `ubuntu-latest` runners even when your computer is 
    Supabase database** step. A successful request prints only
    `Supabase database ping succeeded.` Confirm a scheduled run afterward as well.
 
-No production migration, commit, push or GitHub run is performed by merely adding
-these files. Do not call the automation operational until an actual GitHub run passes.
+Adding these files alone does not apply the migration or start a GitHub run. The
+approved deployment and successful first manual GitHub run are recorded below.
 
 ## Troubleshooting
 
@@ -126,6 +126,14 @@ After explicit owner approval, the migration was applied only to public project
 `kixwwrmedqazurvdnfhi`. A live REST POST using its publishable key returned HTTP 200
 and integer `1`. Both required repository secret names were verified present.
 No application tables, RLS policies, authentication settings, existing workflows,
-protected staging or application deployments were changed. GitHub execution must
-be verified separately after publishing the workflow; a live RPC response alone
-does not prove GitHub scheduling works.
+protected staging or application deployments were changed.
+
+Published only this workflow, migration and documentation to `main` in commit
+`3325bc6517824ddfc53bb5c51ad9b84687fe2ced`, using an isolated checkout to preserve
+unrelated local changes. Both required repository secrets are configured. The
+workflow is active and its first actual manually dispatched GitHub-hosted run
+[41360052815 completed successfully](https://github.com/yashvatsdev/flowforge/actions/runs/41360052815),
+including **Ping the Supabase database**. This verifies the real runner, secret
+injection, REST authentication, RPC request and expected response end to end.
+The scheduled trigger is enabled; the first cron-triggered run has not yet been
+observed. Check the Actions page for subsequent scheduled runs.
